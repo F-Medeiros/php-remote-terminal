@@ -45,6 +45,13 @@
         <nav class="navbar-fixed-top" style="height:10px !important;">
             <span class="text-danger" style="background-color:black;">Pasta atual:</span>
             <span class="text-primary" style="background-color:black;" id="pasta-atual">Inicializando...</span>
+            <div class="dropdown pull-right">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Ações
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a onclick="upload_file();" href="#">Upload de arquivo</a></li>
+                </ul>
+            </div>
         </nav>
 
         <div class="container" style="padding-bottom: 40px;">
@@ -61,10 +68,21 @@
             <input class="form-control" type="text" name="command"/>
         </div>
 
+        <div style="display:none;">
+            <input type="file" id="upload_file" multiple/>
+        </div>
+
     </body>
 </html>
 
 <script>
+
+
+    function upload_file()
+    {
+        $("#upload_file").click();
+    }
+
     //variavel global;
 
     AutoComplete = [];
@@ -75,6 +93,49 @@
 
     $(document).ready(function(){
 
+
+        //FAZ O UPLOAD DO ARQUIVO
+        $("#upload_file").change(function(e){
+
+            if($(this).val() != "")
+            {
+
+                files = e.target.files;
+                var formData = new FormData();
+                // file = [];
+                //
+                // $.each(files, function(key, val) {
+                //     file[key] = val;
+                // });
+                $.each(files, function(key, val) {
+                    formData.append('file[]', val);
+                });
+
+                formData.append('dir', $("#pasta-atual").html() );
+
+                $.ajax({
+                    url: 'ajax/actions.upload.php',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    type: 'post',
+                    success: function(data) {
+
+                        $("#console-result").html($("#console-result").html() + "<br><span class='console-command text-success'" + data + "</span>");
+
+                        $('html, body').animate({scrollTop:$(document).height()}, 'slow');
+
+
+                    }
+                });
+
+
+            }
+
+
+            $(this).val("");
+        });
 
 
         $(document).keydown(function(event){
